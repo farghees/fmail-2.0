@@ -1,0 +1,12 @@
+jmap_url: https://mail.example.com
+listen: ":995"            # implicit TLS
+# listen_plain: "127.0.0.1:1110"   # local testing only; STLS offered if TLS cert is set
+tls_cert: /etc/mailflare-pop3/certs/fullchain.pem
+tls_key: /etc/mailflare-pop3/certs/privkey.pem
+delete_mode: trash        # trash | keep
+allow_insecure_auth: false
+max_failures: 5
+fail_window: 10m
+max_conns: 200
+max_conns_per_ip: 10
+idle_timeout: 10m

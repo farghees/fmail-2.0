@@ -1,0 +1,1 @@
+ALTER TABLE "domains" ADD COLUMN "fallback_sending_provider" text;

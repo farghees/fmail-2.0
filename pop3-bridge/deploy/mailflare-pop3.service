@@ -1,0 +1,47 @@
+[Unit]
+Description=Mailflare POP3-to-JMAP bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mailflare-pop3
+Group=mailflare-pop3
+ExecStart=/usr/local/bin/mailflare-pop3 -config /etc/mailflare-pop3/config.yaml
+# Credentials are copied by systemd (root) into $CREDENTIALS_DIRECTORY at start;
+# the binary uses tls.crt/tls.key from there when tls_cert/tls_key are unset.
+# The lego renew hook restarts the unit after swapping the files.
+LoadCredential=tls.crt:/etc/mailflare-pop3/certs/current/pop.example.com.crt
+LoadCredential=tls.key:/etc/mailflare-pop3/certs/current/pop.example.com.key
+Restart=on-failure
+RestartSec=3
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectProc=invisible
+ProcSubset=pid
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallFilter=@system-service
+SystemCallArchitectures=native
+UMask=0077
+LimitNOFILE=4096
+TasksMax=512
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

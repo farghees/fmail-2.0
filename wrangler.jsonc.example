@@ -1,0 +1,132 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "fmail",
+	// Fill in your Cloudflare account ID (or set CLOUDFLARE_ACCOUNT_ID instead and delete this line).
+	"account_id": "<YOUR_CLOUDFLARE_ACCOUNT_ID>",
+	// The webmail hostname. The hostname's zone must be on the same Cloudflare account.
+	// Wrangler creates the DNS record and certificate on deploy. Remove this block to use the *.workers.dev URL.
+	"routes": [{ "pattern": "mail.example.com", "custom_domain": true }],
+	"main": "./worker.ts",
+	"compatibility_date": "2026-05-20",
+	"keep_vars": true,
+	"vars": { "MAILFLARE_SELF_LICENSED": "1" },
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		"binding": "ASSETS",
+		"not_found_handling": "none",
+	},
+	"images": {
+		"binding": "IMAGES",
+	},
+	"services": [
+		{
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "fmail",
+		},
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "REALTIME",
+				"class_name": "RealtimeHub",
+			},
+		],
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": [
+				"RealtimeHub",
+			],
+		},
+	],
+	"triggers": {
+		"crons": ["0 2 * * *", "*/5 * * * *"],
+	},
+	"ratelimits": [
+		{
+			"name": "LOGIN_RATE_LIMIT",
+			"namespace_id": "1001",
+			"simple": {
+				"limit": 20,
+				"period": 60,
+			},
+		},
+		{
+			"name": "DEVICE_LOGIN_RATE_LIMIT",
+			"namespace_id": "1003",
+			"simple": { "limit": 10, "period": 60 },
+		},
+		{
+			"name": "AGENT_RATE_LIMIT",
+			"namespace_id": "1002",
+			"simple": { "limit": 120, "period": 60 },
+		},
+	],
+	"observability": {
+		"enabled": true,
+		"traces": { "enabled": true },
+	},
+	"upload_source_maps": true,
+	"send_email": [
+		{
+			"name": "EMAIL",
+			"remote": false,
+		},
+	],
+	"ai": { "binding": "AI", "remote": true },
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "fmail",
+			"database_id": "<YOUR_D1_DATABASE_ID>",
+			"migrations_dir": "drizzle/migrations",
+		},
+	],
+	"r2_buckets": [
+		{
+			"binding": "BUCKET",
+			"bucket_name": "fmail-raw",
+		},
+	],
+	"queues": {
+		"producers": [
+			{
+				"binding": "INBOUND_QUEUE",
+				"queue": "fmail-inbound",
+			},
+			{
+				"binding": "OUTBOUND_QUEUE",
+				"queue": "fmail-outbound",
+			},
+			{
+				"binding": "AGENT_QUEUE",
+				"queue": "fmail-agent",
+			},
+		],
+		"consumers": [
+			{
+				"queue": "fmail-inbound",
+				"max_batch_size": 5,
+				// New mail should reach the inbox at once; do not wait up to 5 s for a batch to fill.
+				"max_batch_timeout": 1,
+				"max_retries": 3,
+			},
+			{
+				"queue": "fmail-outbound",
+				"max_batch_size": 5,
+				// Sends wait out the undo window already; do not also wait for a batch to fill.
+				"max_batch_timeout": 1,
+				"max_retries": 3,
+			},
+			{
+				"queue": "fmail-agent",
+				"max_batch_size": 1,
+				"max_retries": 3,
+			},
+		],
+	},
+}
