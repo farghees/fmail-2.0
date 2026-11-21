@@ -7,6 +7,12 @@ import bcrypt from "bcryptjs";
  * path rejects it, so it behaves like a missing password.
  */
 export const PASSWORDLESS_PASSWORD_HASH = "!passkey-only";
+/** OAuth-only signup has a verified Google backup and may explicitly create a password through recovery. */
+export const GOOGLE_ONLY_PASSWORD_HASH = "!google-only";
+
+export function canRecoverPassword(hash: string, googleSub?: string | null): boolean {
+ return hasPasswordHash(hash) || (hash === GOOGLE_ONLY_PASSWORD_HASH && !!googleSub);
+}
 
 export function hashPassword(password: string): string {
 	return bcrypt.hashSync(password, 12);

@@ -218,6 +218,7 @@ export default async function HomePage() {
 					</div>
 				</section> */}
       </main>
+      <footer className="mx-auto max-w-7xl px-6 pb-8 text-sm text-neutral-500"><Link href="/privacy" className="hover:underline">Notis Privasi</Link></footer>
     </div>
     </HomeAuthProvider>
   );

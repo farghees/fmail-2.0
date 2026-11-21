@@ -69,6 +69,11 @@ interface CloudflareEnv {
 	CF_API_KEY?: string;
 	CF_EMAIL?: string;
 	TURNSTILE_SECRET_KEY?: string;
+	/** Google OAuth web client used for Google sign-in and public sign-up. */
+	GOOGLE_CLIENT_ID?: string;
+	GOOGLE_CLIENT_SECRET?: string;
+	/** Hostname of an active domain public sign-ups create mailboxes on; unset disables sign-up. */
+	SIGNUP_DOMAIN?: string;
 	GITHUB_UPDATE_TOKEN?: string;
 	GITHUB_UPDATE_REF?: string;
 	GITHUB_UPDATE_REPO?: string;

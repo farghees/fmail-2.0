@@ -358,6 +358,14 @@
         "ALTER TABLE `users` ADD `drive_quota_bytes` bigint;",
         "UPDATE `app_settings` SET `drive_default_quota_bytes` = `drive_storage_limit_bytes` WHERE `drive_storage_limit_bytes` IS NOT NULL AND `drive_storage_limit_bytes` > 0;"
       ]
+    },
+    {
+      "name": "0015_google_signup.sql",
+      "statements": [
+        "ALTER TABLE `users` ADD `google_sub` varchar(255);",
+        "ALTER TABLE `users` ADD `google_email` text;",
+        "CREATE UNIQUE INDEX `users_google_sub_idx` ON `users` (`google_sub`);"
+      ]
     }
   ]
 }

@@ -32,6 +32,12 @@ export function LoginClient({ adding = false }: { adding?: boolean }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [googleEnabled, setGoogleEnabled] = useState(false);
+  useEffect(() => {
+    const googleError = new URLSearchParams(window.location.search).get("error");
+    if (googleError) setError("Google sign-in could not be completed. Try again or use your existing password/passkey login.");
+    void fetch("/api/auth/google/config", { cache: "no-store" }).then((r) => r.json()).then((data) => setGoogleEnabled((data as { enabled?: boolean }).enabled === true)).catch(() => undefined);
+  }, []);
   const [turnstileReset, setTurnstileReset] = useState(0);
   // Set once the password is accepted for an account with a second factor.
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
@@ -270,6 +276,7 @@ export function LoginClient({ adding = false }: { adding?: boolean }) {
           : t("auth.signInDescription")
       }
     >
+      {googleEnabled && <div className="mb-5 space-y-3"><Button asChild className="h-11 w-full rounded-full"><a href="/api/auth/google/start">Continue with Google</a></Button><p className="text-center text-xs text-neutral-500">or use your existing mailbox login below</p></div>}
       <form method="post" onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">{t("auth.email")}</Label>

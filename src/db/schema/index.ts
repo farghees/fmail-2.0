@@ -11,6 +11,9 @@ export const users = sqliteTable("users", {
 	email: text("email").notNull().unique(),
 	resetEmail: text("reset_email"),
 	forwardingEmail: text("forwarding_email"),
+	/** Google account subject for OAuth sign-in/sign-up; unique when set. */
+	googleSub: text("google_sub"),
+	googleEmail: text("google_email"),
 	/**
 	 * A bcrypt hash, or PASSWORDLESS_PASSWORD_HASH when the account signs in only
 	 * with passkeys. Kept NOT NULL so the column needs no lossy table rebuild on
@@ -72,6 +75,7 @@ export const users = sqliteTable("users", {
 		.$defaultFn(() => new Date()),
 }, (t) => [
 	uniqueIndex("users_booking_username_idx").on(t.bookingUsername),
+	uniqueIndex("users_google_sub_idx").on(t.googleSub),
 	index("users_created_by_idx").on(t.createdByUserId),
 ]);
 

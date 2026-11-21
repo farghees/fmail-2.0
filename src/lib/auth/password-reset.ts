@@ -2,7 +2,7 @@ import { and, eq, gt, isNull } from "drizzle-orm";
 import { getDb } from "@/db";
 import { passwordResetTokens, users } from "@/db/schema";
 import { newId } from "@/lib/ids";
-import { hasPasswordHash, hashPassword } from "@/lib/auth/password";
+import { canRecoverPassword, hashPassword } from "@/lib/auth/password";
 import { deleteUserSessions, hashSessionToken } from "@/lib/auth/session";
 import { getBranding } from "@/lib/branding/service";
 import { sendSystemEmail } from "@/lib/email/system-mail";
@@ -21,8 +21,8 @@ const TOKEN_MINUTES = 30;
 export async function requestPasswordReset(env: CloudflareEnv, email: string, origin: string, t: Translator): Promise<void> {
 	const db = getDb(env);
 	const [user] = await db.select().from(users).where(eq(users.email, email.trim().toLowerCase())).limit(1);
-	// A passkey-only account must not regain password sign-in through email.
-	if (!user || user.disabled || !user.resetEmail || !hasPasswordHash(user.passwordHash)) return;
+	// Explicit passkey-only accounts cannot regain passwords. Google-only signup can recover to its verified backup.
+	if (!user || user.disabled || !user.resetEmail || !canRecoverPassword(user.passwordHash, user.googleSub)) return;
 
 	const token = newId("prt");
 	await db.insert(passwordResetTokens).values({
@@ -54,6 +54,7 @@ export async function completePasswordReset(
 			id: passwordResetTokens.id,
 			userId: passwordResetTokens.userId,
 			passwordHash: users.passwordHash,
+			googleSub: users.googleSub,
 			securityVersion: users.securityVersion,
 			totpEnabled: users.totpEnabled,
 			requireSecondFactor: users.requireSecondFactor,
@@ -68,7 +69,7 @@ export async function completePasswordReset(
 			),
 		)
 		.limit(1);
-	if (!row || !hasPasswordHash(row.passwordHash)) return { ok: false, error: "This reset link is invalid or has expired. Request a new one." };
+	if (!row || !canRecoverPassword(row.passwordHash, row.googleSub)) return { ok: false, error: "This reset link is invalid or has expired. Request a new one." };
 
 	// A password reset never creates a password for a passkey-only account; a
 	// token issued before the password was removed must not become a bypass.

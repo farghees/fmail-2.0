@@ -96,3 +96,7 @@ A schema change needs a migration for each database type. See [Databases](docs/d
 Fmail is licensed under the [GNU Affero General Public License v3.0](LICENSE). It is a fork of [Mailflare](https://github.com/hieunc229/mailflare) (c) its contributors, also AGPL-3.0; upstream copyright and attribution are retained as the license requires.
 
 If you run a modified Fmail as a network service, the AGPL requires you to offer your users the corresponding source. The app links to `/source.tar.gz` on your deployment; `npm run build` regenerates that archive from your committed `HEAD`, so commit your changes before building.
+
+## Google sign-in and public signup
+
+Optional Google sign-in supports a chosen UserID, verified Google recovery address and default-off incoming forwarding. See [configuration and security notes](docs/google-signup.md). This is separate from first-admin setup and requires operator configuration, database migrations and service verification.
