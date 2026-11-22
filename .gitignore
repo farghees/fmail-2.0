@@ -72,3 +72,9 @@ skills-lock.json
 
 # Your deployment config (copy wrangler.jsonc.example to wrangler.jsonc and fill it in)
 /wrangler.jsonc
+
+# Standalone setup tutorial
+/tutorial/node_modules/
+/tutorial/dist/
+/tutorial/.wrangler/
+/tutorial/wrangler.jsonc

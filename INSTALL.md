@@ -88,7 +88,7 @@ curl -s https://api.cloudflare.com/client/v4/user/tokens/verify -H "Authorizatio
 ## Step 2: Get the code and install
 
 ```bash
-git clone https://github.com/farghees/Fmail fmail && cd fmail
+git clone https://github.com/farghees/fmail-2.0 fmail && cd fmail
 npm install
 ```
 

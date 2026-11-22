@@ -1,3 +1,11 @@
+# Fmail 2.0
+
+This repository combines the Fmail app, Google signup/login changes and the standalone React/Three.js setup tutorial in `tutorial/`. It preserves the original Fmail source history and AGPL-3.0 license.
+
+The app and tutorial build separately. For Google setup, see `docs/google-signup.md`; for the guide, see `tutorial/README.md`. This source update does not deploy anything or include production credentials.
+
+Operator configuration, database migrations, review of the privacy template and live mail/forwarding tests are still required before enabling the features in another installation.
+
 <img src="public/icon-192.png" alt="Fmail" width="96" />
 
 # Fmail

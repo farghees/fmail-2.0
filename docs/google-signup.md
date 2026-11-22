@@ -32,3 +32,7 @@ Run `node --test tests/google-oauth.test.mjs tests/google-forwarding.test.mjs te
 ## Installation-specific privacy notice
 
 The included `/privacy` page is a starting template, not legal advice. Before enabling public signup, the operator must review it against actual storage, email providers, retention and deletion practices, and add the installation's support/privacy contact. Do not copy another operator's contact details or claim unverified practices.
+
+## Repository updates
+
+For the optional dashboard update workflow, the source defaults to the current repository. Set repository variable `UPDATE_SOURCE_REPOSITORY` only when deliberately selecting another source. Do not point it at an earlier baseline that lacks these features.
