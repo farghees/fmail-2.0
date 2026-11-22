@@ -6,6 +6,29 @@ The app and tutorial build separately. For Google setup, see `docs/google-signup
 
 Operator configuration, database migrations, review of the privacy template and live mail/forwarding tests are still required before enabling the features in another installation.
 
+## Prerequisites (setup through Instinct)
+
+For the Cloudflare + Resend setup, prepare the items below. You do **not** need to install Node.js, Git, Wrangler or a VPS on your own device when Instinct handles the technical setup. Those tools belong to the installer workflow in [INSTALL.md](INSTALL.md), not this reader checklist.
+
+1. **Domain**: a domain you own, access to its registrar/nameservers and DNS, and your chosen webmail address (for example `mail.example.com`). The mail domain and webmail zone must be active in the intended Cloudflare account before deployment. Approve any mail DNS/MX changes first if the domain already receives email elsewhere.
+2. **Cloudflare account and API access**: access to the correct account and any sign-in approvals. A **Global API Key plus its Cloudflare account email** is supported (`CF_API_KEY` + `CF_EMAIL`), but is a broad, legacy credential. Prefer scoped API tokens where possible: `CF_TOKEN` for the app, with separate deploy authorization for the installer. See the permission tables in [INSTALL.md](INSTALL.md). A Global API Key is not an API token, and you do not need both runtime methods.
+3. **Resend account and API key**: a sender domain verified in Resend. A domain-limited **Sending access** key can send mail; automated domain creation/verification, domain-status checks and webhook management need **Full access**. If using a sending-only key, domain setup must be completed separately in the provider dashboard; do not expect in-app domain management to work with it. Approve broader access only when needed.
+4. **Google OAuth Client ID and Client Secret (optional)**: only for Google sign-in/public signup, not the core mailbox installation. Use a Google Cloud project you control and a **Web application** OAuth client. Configure its consent/audience settings and the exact HTTPS callback `<APP_URL>/api/auth/google/callback`. Client ID alone is not enough for this app. Instinct configures `APP_URL`, `SIGNUP_DOMAIN` and the required migrations. See [Google signup](docs/google-signup.md).
+
+### Anything else to have ready?
+
+- **R2 activation and billing approval**: the default Cloudflare setup stores mail/files in R2. Enable the R2 subscription in your account and complete Cloudflare's billing/payment-method checks when requested. It has a free monthly allowance, not a guarantee of no charges. Review usage limits and approve costs before activation or a plan upgrade.
+- **First admin details**: choose the admin mailbox name and an external recovery email you can access. Set the password or passkey on the secure setup page, not in chat. The recovery address need not be Gmail; Google login is optional.
+- **Verification and final checks**: be available for account sign-in, email verification and registrar changes that require you. Allow an external mailbox to be used for send/receive tests. Public signup also needs a reviewed privacy notice with your own support/privacy contact.
+
+**Optional incoming forwarding** stays off by default. Enabling copies to a user's Google recovery address requires that user's opt-in, Cloudflare destination-email verification, and account-level Email Routing Addresses edit permission for a scoped runtime token, with the account owner's approval. Forwarding is not required to receive mail inside Fmail.
+
+**Instinct handles the generated setup**: identifying the correct account/zone IDs, creating the Worker, D1 database, R2 bucket, queues and other bindings, setting configuration/secrets, applying migrations, configuring Email Routing and checking delivery. These are installation work, not extra accounts or API keys you must prepare. A GitHub token, AWS account, external database, Turnstile keys and separate paid AI-provider key are not prerequisites for this basic path; optional features or other hosting/provider choices have their own requirements.
+
+**Keep secrets private**: request a secure secret-storage link from Instinct, or enter credentials directly on the provider's secure page when guided. Never paste API keys, OAuth Client Secrets, passwords or payment details into chat, screenshots, issues or this repository. Do not rotate existing keys just to install Fmail.
+
+Provider references: [Cloudflare Global API Key and token guidance](https://developers.cloudflare.com/fundamentals/api/get-started/keys/), [R2 activation](https://developers.cloudflare.com/r2/get-started/), [R2 pricing](https://developers.cloudflare.com/r2/pricing/), [Cloudflare billing](https://developers.cloudflare.com/billing/understand/billing-policy/), [Resend key permissions](https://resend.com/docs/dashboard/api-keys), [Google web-server OAuth](https://developers.google.com/identity/protocols/oauth2/web-server).
+
 <img src="public/icon-192.png" alt="Fmail" width="96" />
 
 # Fmail
@@ -56,7 +79,7 @@ The recommended path is [INSTALL.md](INSTALL.md), a step-by-step guide written f
 2. Create the D1 database, R2 bucket and queues, apply the D1 migrations, set the Worker secrets, then run `npm run deploy`.
 3. Open the app, create your admin account and connect a domain.
 
-> **`CF_TOKEN` is required.** Create a scoped Cloudflare API token with the permissions listed in [INSTALL.md](INSTALL.md) (the supported install path).
+> **Cloudflare runtime API access is required.** Prefer a scoped `CF_TOKEN` with the permissions listed in [INSTALL.md](INSTALL.md). The app also supports the legacy `CF_API_KEY` + `CF_EMAIL` pair. Installer deployment authorization is separate.
 
 More options: [deployment guide](docs/deployment.md).
 
